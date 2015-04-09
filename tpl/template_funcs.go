@@ -886,6 +886,17 @@ func Highlight(in interface{}, lang string) template.HTML {
 	return template.HTML(helpers.Highlight(html.UnescapeString(str), lang))
 }
 
+func CodeHighlight(in interface{}, useTable string, tableNum int64) template.HTML {
+	var str string
+	av := reflect.ValueOf(in)
+	switch av.Kind() {
+	case reflect.String:
+		str = av.String()
+	}
+
+	return template.HTML(helpers.CodeHighlight(html.UnescapeString(str), useTable, tableNum))
+}
+
 var markdownTrimPrefix = []byte("<p>")
 var markdownTrimSuffix = []byte("</p>\n")
 
@@ -1150,53 +1161,54 @@ func ModBool(a, b interface{}) (bool, error) {
 
 func init() {
 	funcMap = template.FuncMap{
-		"urlize":      helpers.URLize,
-		"sanitizeURL": helpers.SanitizeURL,
-		"sanitizeurl": helpers.SanitizeURL,
-		"eq":          Eq,
-		"ne":          Ne,
-		"gt":          Gt,
-		"ge":          Ge,
-		"lt":          Lt,
-		"le":          Le,
-		"in":          In,
-		"slicestr":    Slicestr,
-		"substr":      Substr,
-		"split":       Split,
-		"intersect":   Intersect,
-		"isSet":       IsSet,
-		"isset":       IsSet,
-		"echoParam":   ReturnWhenSet,
-		"safeHTML":    SafeHTML,
-		"safeCSS":     SafeCSS,
-		"safeURL":     SafeURL,
-		"markdownify": Markdownify,
-		"first":       First,
-		"where":       Where,
-		"delimit":     Delimit,
-		"sort":        Sort,
-		"highlight":   Highlight,
-		"add":         func(a, b interface{}) (interface{}, error) { return doArithmetic(a, b, '+') },
-		"sub":         func(a, b interface{}) (interface{}, error) { return doArithmetic(a, b, '-') },
-		"div":         func(a, b interface{}) (interface{}, error) { return doArithmetic(a, b, '/') },
-		"mod":         Mod,
-		"mul":         func(a, b interface{}) (interface{}, error) { return doArithmetic(a, b, '*') },
-		"modBool":     ModBool,
-		"lower":       func(a string) string { return strings.ToLower(a) },
-		"upper":       func(a string) string { return strings.ToUpper(a) },
-		"title":       func(a string) string { return strings.Title(a) },
-		"partial":     Partial,
-		"ref":         Ref,
-		"relref":      RelRef,
-		"apply":       Apply,
-		"chomp":       Chomp,
-		"replace":     Replace,
-		"trim":        Trim,
-		"dateFormat":  DateFormat,
-		"getJSON":     GetJSON,
-		"getCSV":      GetCSV,
-		"seq":         helpers.Seq,
-		"getenv":      func(varName string) string { return os.Getenv(varName) },
+		"urlize":        helpers.URLize,
+		"sanitizeURL":   helpers.SanitizeURL,
+		"sanitizeurl":   helpers.SanitizeURL,
+		"eq":            Eq,
+		"ne":            Ne,
+		"gt":            Gt,
+		"ge":            Ge,
+		"lt":            Lt,
+		"le":            Le,
+		"in":            In,
+		"slicestr":      Slicestr,
+		"substr":        Substr,
+		"split":         Split,
+		"intersect":     Intersect,
+		"isSet":         IsSet,
+		"isset":         IsSet,
+		"echoParam":     ReturnWhenSet,
+		"safeHTML":      SafeHTML,
+		"safeCSS":       SafeCSS,
+		"safeURL":       SafeURL,
+		"markdownify":   Markdownify,
+		"first":         First,
+		"where":         Where,
+		"delimit":       Delimit,
+		"sort":          Sort,
+		"highlight":     Highlight,
+		"codeHighlight": CodeHighlight,
+		"add":           func(a, b interface{}) (interface{}, error) { return doArithmetic(a, b, '+') },
+		"sub":           func(a, b interface{}) (interface{}, error) { return doArithmetic(a, b, '-') },
+		"div":           func(a, b interface{}) (interface{}, error) { return doArithmetic(a, b, '/') },
+		"mod":           Mod,
+		"mul":           func(a, b interface{}) (interface{}, error) { return doArithmetic(a, b, '*') },
+		"modBool":       ModBool,
+		"lower":         func(a string) string { return strings.ToLower(a) },
+		"upper":         func(a string) string { return strings.ToUpper(a) },
+		"title":         func(a string) string { return strings.Title(a) },
+		"partial":       Partial,
+		"ref":           Ref,
+		"relref":        RelRef,
+		"apply":         Apply,
+		"chomp":         Chomp,
+		"replace":       Replace,
+		"trim":          Trim,
+		"dateFormat":    DateFormat,
+		"getJSON":       GetJSON,
+		"getCSV":        GetCSV,
+		"seq":           helpers.Seq,
+		"getenv":        func(varName string) string { return os.Getenv(varName) },
 
 		// "getJson" is deprecated. Will be removed in 0.15.
 		"getJson": func(urlParts ...string) interface{} {

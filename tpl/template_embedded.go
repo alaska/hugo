@@ -23,6 +23,20 @@ func (t *GoHTMLTemplate) EmbedShortcodes() {
 	t.AddInternalShortcode("relref.html", `{{ .Get 0 | relref .Page }}`)
 	t.AddInternalShortcode("highlight.html", `{{ .Get 0 | highlight .Inner  }}`)
 	t.AddInternalShortcode("test.html", `This is a simple Test`)
+	t.AddInternalShortcode("codehighlight.html", `
+{{ with $.Page.Scratch.Get "codeEntryNumber" }}{{ $.Page.Scratch.Add "codeEntryNumber" 1 }}{{ else }}{{ $.Page.Scratch.Set "codeEntryNumber" 0 }}{{$.Page.Scratch.Add "codeEntryNumber" 1 }}{{ end }}
+{{ $table := or (.Get "table") "false" }}
+<pre class='code' id='code-{{ $.Page.Scratch.Get "codeEntryNumber" }}'>
+{{ codeHighlight .Inner $table ($.Page.Scratch.Get "codeEntryNumber")}}</pre>
+<div class="code-footer">
+	<div class="code-footer-content">
+		{{ with .Get "name" }}<div class="code-label">{{.}}</div>{{ end }}
+		{{ with .Get "pg"}}<a href="https://play.golang.org/p/{{.}}" class="extern_code goplayground"></a>{{ end }}
+		{{ with .Get "gh"}}<a href="https://github.com/{{.}}" class="extern_code github"></a>{{ end }}
+	</div>
+</div>
+`)
+	t.AddInternalShortcode("codeline.html", `{{ $codeEntry := $.Page.Scratch.Get "codeEntryNumber" }}{{ $line := .Get 0 }}<span class='code-line-link' onMouseOver='_HUGO_HLCode({{ $codeEntry }}, "{{ $line }}")' onMouseOut='_HUGO_DEHLCode({{ $codeEntry }}, "{{ $line }}")'>{{ .Inner }}</span>`)
 	t.AddInternalShortcode("figure.html", `<!-- image -->
 <figure {{ with .Get "class" }}class="{{.}}"{{ end }}>
     {{ with .Get "link"}}<a href="{{.}}">{{ end }}
@@ -204,4 +218,21 @@ func (t *GoHTMLTemplate) EmbedTemplates() {
 <meta itemprop="keywords" content="{{ range $plural, $terms := .Site.Taxonomies }}{{ range $term, $val := $terms }}{{ printf "%s," $term }}{{ end }}{{ end }}" />
 {{ end }}`)
 
+	t.AddInternalTemplate("", "codehighlightjs.html", `<script type="text/javascript">
+function _HUGO_CodeLineApplyClass (classToApply, tableNumber, lines) {
+    var hlLines = lines.split(",");
+    for (var i = 0; i < hlLines.length; i++) {
+		document.getElementById("codetable-"+tableNumber+"-line-"+hlLines[i]).className=classToApply;
+    }
+}
+
+function _HUGO_HLCode (codeSelection, lines) {
+    _HUGO_CodeLineApplyClass("codetable-line codetable-line-hl", codeSelection, lines);
+}
+
+function _HUGO_DEHLCode (codeSelection, lines) {
+    _HUGO_CodeLineApplyClass("codetable-line", codeSelection, lines);
+}
+</script>
+<noscript>Please enable JavaScript to enable code line highlighting.</a></noscript>`)
 }
