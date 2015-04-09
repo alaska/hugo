@@ -31,8 +31,8 @@ func (t *GoHTMLTemplate) EmbedShortcodes() {
 <div class="code-footer">
 	<div class="code-footer-content">
 		{{ with .Get "name" }}<div class="code-label">{{.}}</div>{{ end }}
-		{{ with .Get "pg"}}<a href="https://play.golang.org/p/{{.}}" class="extern_code goplayground"></a>{{ end }}
-		{{ with .Get "gh"}}<a href="https://github.com/{{.}}" class="extern_code github"></a>{{ end }}
+		{{ with .Get "pg"}}<a href="https://play.golang.org/p/{{.}}" target="_blank" class="extern_code goplayground"></a>{{ end }}
+		{{ with .Get "gh"}}<a href="https://github.com/{{.}}" target="_blank" class="extern_code github"></a>{{ end }}
 	</div>
 </div>
 `)
